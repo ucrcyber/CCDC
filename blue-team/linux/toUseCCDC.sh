@@ -21,6 +21,7 @@ printf 'Option 9 : Change permissions on /root /home/* to only be for root & the
 printf 'Option 10 : (ONLY CENTOS) install mod_security\n'
 printf 'Option 11 : Setup Ansible client/server\n'
 printf 'Option 12 : Secures PostFix\n'
+printf 'Option 13 : nmap -A -T4 192.168.1.0/24 >> nmapScan.txt\n'
 read -r option
 
 if [[ -z "$option" ]]; then
@@ -39,7 +40,7 @@ if [[ "$option" = "1" ]]; then
 	fi
 
 	for user in $(awk -F: '$7 ~ /(\/sh|\/bash)/ { print $1 }' /etc/passwd); do
-		if [[ $(id -u $user) -eq 0 ]]; then 
+		if [[ $(id -u $user) -eq 0 ]]; then
 			continue
 		fi
 		echo ""
@@ -122,7 +123,7 @@ if [[ "$option" = "5" ]]; then
 	read -r optionEorS
 
 	if [[ ${ID_LIKE} = "ID_LIKE=debian" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"debian\"" ]]; then
-		apt-get install build-essential inotify-tools wget git
+		apt-get -y install build-essential inotify-tools wget git
 		wget -U ossec https://bintray.com/artifact/download/ossec/ossec-hids/ossec-hids-2.8.3.tar.gz
 		tar -xvzf ossec-hids-2.8.3.tar.gz
 		cd ossec-hids-2.8.3
@@ -157,18 +158,18 @@ if [[ "$option" = "5" ]]; then
 			echo "deb http://packages.elastic.co/kibana/4.5/debian stable main" | sudo tee -a /etc/apt/sources.list.d/kibana-4.5.x.list
 			apt-get update
 			apt-get -y install kibana
-			vi /opt/kibana/config/kibana.yml 
+			vi /opt/kibana/config/kibana.yml
 			update-rc.d kibana defaults 96 9
 			service kibana start
 
 			printf '\nTime for Nginx!\n'
 			apt-get install nginx apache2-utils
-			htpasswd -c /etc/nginx/htpasswd.users jeff 
-			rm -rf /etc/nginx/sites-available/default 
-			touch /etc/nginx/sites-available/default 
+			htpasswd -c /etc/nginx/htpasswd.users jeff
+			rm -rf /etc/nginx/sites-available/default
+			touch /etc/nginx/sites-available/default
 			printf '\nWhat is the server_name? (example.com)\n'
 			read -r serverName
-			echo "	
+			echo "
 			server {
 		  		listen 80;
 
@@ -183,10 +184,10 @@ if [[ "$option" = "5" ]]; then
 					proxy_set_header Upgrade $http_upgrade;
 					proxy_set_header Connection 'upgrade';
 					proxy_set_header Host $host;
-					proxy_cache_bypass $http_upgrade;        
+					proxy_cache_bypass $http_upgrade;
 				}
 		    	}
-			" >> /etc/nginx/sites-available/default 
+			" >> /etc/nginx/sites-available/default
 			service nginx restart
 
 			printf '\nTime for Logstash\n'
@@ -198,9 +199,9 @@ if [[ "$option" = "5" ]]; then
 			vi /etc/ssl/openssl.cnf
 			cd /etc/pki/tls
 			sudo openssl req -config /etc/ssl/openssl.cnf -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout private/logstash-forwarder.key -out certs/logstash-forwarder.crt
-			vi /etc/logstash/conf.d/02-beats-input.conf 
-			vi /etc/logstash/conf.d/10-syslog-filter.conf 
-			vi /etc/logstash/conf.d/30-elasticsearch-output.conf 
+			vi /etc/logstash/conf.d/02-beats-input.conf
+			vi /etc/logstash/conf.d/10-syslog-filter.conf
+			vi /etc/logstash/conf.d/30-elasticsearch-output.conf
 			service logstash configtest
 			service logstash restart
 			update-rc.d logstash defaults 96 9
@@ -448,8 +449,8 @@ if [[ "$option" = "11" ]]; then
 			chattr +i /etc/apt/*
 		fi
 	fi
-	
-	if [[ ${ID_LIKE} = "ID_LIKE=rhel fedora" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"rhel fedora\"" ]];
+
+	if [[ ${ID_LIKE} = "ID_LIKE=rhel fedora" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"rhel fedora\"" ]]; then
 		if [[ "$optionCorS" = "C" ]] || [[ "$optionCorS" = "c" ]] || [[ "$optionCorS" = "Client" ]] || [[ "$optionCorS" = "client" ]] || [[ "$optionCorS" = "CLIENT" ]]; then
 			printf '\nInstalling Ansible\n'
 			yum install epel-release
@@ -468,7 +469,7 @@ if [[ "$option" = "11" ]]; then
 			ssh-keygen
 			printf '\nAll set! Be sure to edit the /etc/ansible/hosts file and to place the PUBLIC ssh key from the server in ~/.ssh/authorized_keys on the clients\n'
 		fi
-	fi
+fi
 
 	if [[ ${ID_LIKE} = "ID_LIKE=arch" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"arch\"" ]]; then
 		if [[ "$optionCorS" = "C" ]] || [[ "$optionCorS" = "c" ]] || [[ "$optionCorS" = "Client" ]] || [[ "$optionCorS" = "client" ]] || [[ "$optionCorS" = "CLIENT" ]]; then
@@ -485,7 +486,6 @@ if [[ "$option" = "11" ]]; then
 			printf '\nAll set! Be sure to edit the /etc/ansible/hosts file and to place the PUBLIC ssh key from the server in ~/.ssh/authorized_keys on the clients\n'
 		fi
 	fi
-
 fi
 
 if [[ "$option" = "12" ]]; then
@@ -513,6 +513,29 @@ if [[ "$option" = "12" ]]; then
 			printf '\nSince it is not root, kill it and start as root\n'
 		fi
 	fi
+fi
+
+if [[ "$option" = "13" ]]; then
+	ID_LIKE="$(cat /etc/*release | grep "ID_LIKE")"
+	printf '\nInstalling nmap\n'
+
+	if [[ ${ID_LIKE} = "ID_LIKE=debian" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"debian\"" ]]; then
+		printf '\nDebian? cool!'
+		apt-get update && apt-get install nmap -y
+		nmap -A -T4 192.168.1.0/24 >> nmapScan.txt &
+	fi
+
+	if [[ ${ID_LIKE} = "ID_LIKE=rhel fedora" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"rhel fedora\"" ]]; then
+		yum update && yum install nmap
+		nmap -A -T4 192.168.1.0/24 >> nmapScan.txt &
+	fi
+
+	if [[ ${ID_LIKE} = "ID_LIKE=arch" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"arch\"" ]]; then
+		pacman -S nmap
+		nmap -A -T4 192.168.1.0/24 >> nmapScan.txt &
+	fi
+
+	printf '\nThe nmap scan is now running in the background! Check for the txt in about 2 min!'
 fi
 
 done
