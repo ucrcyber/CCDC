@@ -27,6 +27,16 @@ fi
 # /// FTP/DNS security
 # /// [[ doneForCentOS/RHEL/Fedora) ]] modsecurity
 # /// replace default rc files with safe ones, ie bashrc with a default with secure aliases and such
+# /// check var spool for cron as well as etc
+# /// change wordpress passwords
+# /// change db passwords
+# /// nesses
+
+# /// watch out for
+# /// automated scans, stop user agents (hi im firefox)
+# /// use a local scanner () to find and repair our stuff before hand
+# /// check permissions on web to stop
+# /// look up BloodHound (windows),
 
 # /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// #
 # /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// #
@@ -61,12 +71,13 @@ printf 'Option 9 : Change permissions on /root /home/* to only be for root & the
 printf 'Option 10 : (ONLY CENTOS) install mod_security\n'
 printf 'Option 11 : setup Ansible client/server\n'
 printf 'Option 12 : Secure PostFix mail\n'
+printf 'Option 13 : nmap -A -T4 192.168.1.0/24 >> nmapScan.txt\n'
 
-printf '[[ TODO ]] Option 13 : default rc files & chattr +i for nano/vi/vim/bash/zsh/fsh/etc ...\n'
-printf '[[ TODO ]] Option 14 : audit SystemD services\n'
-printf '[[ TODO ]] Option 15 : domain join linux\n'
-printf '[[ TODO ]] Option 16 : Remove GCC, NC\n'
-printf ' (delay) [[ TODO ]] Option 17 : audit sources/mirrors\n'
+printf '[[ TODO ]] Option 14 : default rc files & chattr +i for nano/vi/vim/bash/zsh/fsh/etc ...\n'
+printf '[[ TODO ]] Option 15 : audit SystemD services\n'
+printf '[[ TODO ]] Option 16 : domain join linux\n'
+printf '[[ TODO ]] Option 17 : Remove GCC, NC\n'
+printf ' (delay) [[ TODO ]] Option 18 : audit sources/mirrors\n'
 read -r option
 
 if [[ -z "$option" ]]; then
@@ -233,11 +244,11 @@ if [[ "$option" = "5" ]]; then
 			printf '\nTime for Nginx!\n'
 			apt-get install nginx apache2-utils
 			htpasswd -c /etc/nginx/htpasswd.users jeff #jeff is the kibanaadmin name
-			rm -rf /etc/nginx/sites-available/default 
-			touch /etc/nginx/sites-available/default 
+			rm -rf /etc/nginx/sites-available/default
+			touch /etc/nginx/sites-available/default
 			printf '\nWhat is the server_name? (example.com)\n'
 			read -r serverName
-			echo "	
+			echo "
 			server {
 		  		listen 80;
 
@@ -252,10 +263,10 @@ if [[ "$option" = "5" ]]; then
 					proxy_set_header Upgrade $http_upgrade;
 					proxy_set_header Connection 'upgrade';
 					proxy_set_header Host $host;
-					proxy_cache_bypass $http_upgrade;        
+					proxy_cache_bypass $http_upgrade;
 				}
 		    	}
-			" >> /etc/nginx/sites-available/default 
+			" >> /etc/nginx/sites-available/default
 			service nginx restart
 
 			printf '\nTime for Logstash\n'
@@ -548,7 +559,7 @@ if [[ "$option" = "11" ]]; then
 			chattr +i /etc/apt/*
 		fi
 	fi
-	
+
 	if [[ ${ID_LIKE} = "ID_LIKE=rhel fedora" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"rhel fedora\"" ]];
 		if [[ "$optionCorS" = "C" ]] || [[ "$optionCorS" = "c" ]] || [[ "$optionCorS" = "Client" ]] || [[ "$optionCorS" = "client" ]] || [[ "$optionCorS" = "CLIENT" ]]; then
 			printf '\nInstalling Ansible\n'
@@ -621,8 +632,38 @@ fi
 
 
 
-#default rc files
+
+
+
 if [[ "$option" = "13" ]]; then
+	ID_LIKE="$(cat /etc/*release | grep "ID_LIKE")"
+	printf '\nInstalling nmap\n'
+
+	if [[ ${ID_LIKE} = "ID_LIKE=debian" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"debian\"" ]]; then
+		printf '\nDebian? cool!'
+		apt-get update && apt-get install nmap -y
+		nmap -A -T4 192.168.1.0/24 >> nmapScan.txt &
+	fi
+
+	if [[ ${ID_LIKE} = "ID_LIKE=rhel fedora" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"rhel fedora\"" ]]; then
+		yum update && yum install nmap
+		nmap -A -T4 192.168.1.0/24 >> nmapScan.txt &
+	fi
+
+	if [[ ${ID_LIKE} = "ID_LIKE=arch" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"arch\"" ]]; then
+		pacman -S nmap
+		nmap -A -T4 192.168.1.0/24 >> nmapScan.txt &
+	fi
+
+	printf '\nThe nmap scan is now running in the background! Check for the txt in about 2 min!'
+fi
+
+
+
+
+
+#default rc files
+if [[ "$option" = "14" ]]; then
 	printf '\nTODO\n'
 fi
 
@@ -630,7 +671,7 @@ fi
 
 
 #audit SystemD services
-if [[ "$option" = "14" ]]; then
+if [[ "$option" = "15" ]]; then
 	printf '\nTODO\n'
 fi
 
@@ -639,7 +680,7 @@ fi
 
 
 #domain join linux to windows AD and stuff
-if [[ "$option" = "15" ]]; then
+if [[ "$option" = "16" ]]; then
 	printf '\nTODO\n'
 fi
 
@@ -647,7 +688,7 @@ fi
 
 
 #Removes GCC, NC
-if [[ "$option" = "16" ]]; then
+if [[ "$option" = "17" ]]; then
 	if [[ ${ID_LIKE} = "ID_LIKE=rhel fedora" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"rhel fedora\"" ]]; then
 		printf '\nTODO\n'
 	fi
@@ -667,7 +708,7 @@ fi
 
 
 #audit sources/mirrors
-if [[ "$option" = "16" ]]; then
+if [[ "$option" = "18" ]]; then
 	if [[ ${ID_LIKE} = "ID_LIKE=rhel fedora" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"rhel fedora\"" ]]; then
 		printf '\nTODO\n'
 	fi
