@@ -45,7 +45,7 @@ if [[ "$option" = "1" ]]; then
 		fi
 		echo ""
 		echo "\nChanging password for $user"
-		newPass="$passTemp$user"
+		newPass="$passTemp"
 		echo -e "$newPass\\n$newPass" | passwd "$user"
 	done
 
