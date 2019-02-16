@@ -788,7 +788,6 @@ if [[ "$option" = "22" ]]; then
 	if [[ ${ID_LIKE} = "ID_LIKE=debian" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"debian\"" ]]; then
 		sudo apt-get --purge remove xinetd nis yp-tools tftpd atftpd tftpd-hpa telnetd rsh-server rsh-redone-server
 	fi
-	printf '\nTODO\n'
 fi
 
 
