@@ -21,7 +21,7 @@ printf 'Option 9 : Change permissions on /root /home/* to only be for root & the
 printf 'Option 10 : (ONLY CENTOS) install mod_security\n'
 printf 'Option 11 : Setup Ansible client/server\n'
 printf 'Option 12 : Secures PostFix\n'
-printf 'Option 13 : nmap -A -T4 192.168.1.0/24 >> nmapScan.txt\n'
+printf 'Option 13 : nmap -A -T4 192.168.1.0/24 >> nmapScan.txt &\n'
 read -r option
 
 if [[ -z "$option" ]]; then
@@ -368,19 +368,19 @@ fi
 
 if [[ "$option" = "8" ]]; then
 	echo "
-	Protocol 2
-	AllowUsers root admin webmaster
-	AllowGroup sshusers
-	PasswordAuthentication no
-	HostbasedAuthentication no
-	RSAAuthentication yes
-	PubkeyAuthentication yes
-	PermitEmptyPasswords no
-	PermitRootLogin no
-	ServerKeyBits 2048
-	IgnoreRhosts yes
-	RhostsAuthentication no
-	RhostsRSAAuthentication no" >> /etc/ssh/ssh_config
+Protocol 2
+AllowUsers root admin webmaster
+AllowGroup sshusers
+PasswordAuthentication no
+HostbasedAuthentication no
+RSAAuthentication yes
+PubkeyAuthentication yes
+PermitEmptyPasswords no
+PermitRootLogin no
+ServerKeyBits 2048
+IgnoreRhosts yes
+RhostsAuthentication no
+RhostsRSAAuthentication no" >> /etc/ssh/ssh_config
 
 	chattr +i /etc/ssh/ssh_config
 	lsattr /etc/ssh/*
@@ -388,9 +388,10 @@ if [[ "$option" = "8" ]]; then
 fi
 
 if [[ "$option" = "9" ]]; then
-	printf '\nChanging Permissions on /root & /home/* . . .\n'
-	chmod -Rv go-rwx /root
-	chmod -Rv go-w /home/*
+	printf '\nChanging Permissions on /root & /home/* . . . \n'
+	chmod -Rv go-rwx /root &
+	chmod -Rv go-w /home/* &
+	printf '\nThe time to finish will depend on the amount of users and files,\nthe task is running in the background so it will finish without telling you\n'
 fi
 
 if [[ "$option" = "10" ]]; then

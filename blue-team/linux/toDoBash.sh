@@ -31,6 +31,8 @@ fi
 # /// change wordpress passwords
 # /// change db passwords
 # /// nesses
+# /// fail2ban
+# /// exim4
 
 # /// watch out for
 # /// automated scans, stop user agents (hi im firefox)
@@ -43,6 +45,9 @@ fi
 # /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// #
 
 # /// DISTROS TO DO
+# ///
+# /// FREEBSD!!!!!
+# ///
 # /// Mint/Ubuntu/Debian, CentOS/RHEL/Fedora,
 # /// Alpine, Arch, Gentoo, elementaryOS,
 # /// Manjaro, ?KDE Neon?, Void linux, OpenSUSE, ?BSD?
@@ -78,6 +83,11 @@ printf '[[ TODO ]] Option 15 : audit SystemD services\n'
 printf '[[ TODO ]] Option 16 : domain join linux\n'
 printf '[[ TODO ]] Option 17 : Remove GCC, NC\n'
 printf ' (delay) [[ TODO ]] Option 18 : audit sources/mirrors\n'
+printf '[[ TODO ]] Option 19 : install and setup fail2ban\n'
+printf '[[ TODO ]] Option 20 : secure exim4\n'
+printf '[[ TODO ]] Option 21 : secure RedMail\n'
+printf '[[ TODO ]] Option 22 : remove FTP/Telnet/Rlogin/Rsh services\n'
+
 read -r option
 
 if [[ -z "$option" ]]; then
@@ -470,19 +480,19 @@ fi
 #ssh configs
 if [[ "$option" = "8" ]]; then
 	echo "
-	Protocol 2
-	AllowUsers root admin webmaster
-	AllowGroup sshusers
-	PasswordAuthentication no
-	HostbasedAuthentication no
-	RSAAuthentication yes
-	PubkeyAuthentication yes
-	PermitEmptyPasswords no
-	PermitRootLogin no
-	ServerKeyBits 2048
-	IgnoreRhosts yes
-	RhostsAuthentication no
-	RhostsRSAAuthentication no" >> /etc/ssh/ssh_config
+Protocol 2
+AllowUsers root admin webmaster
+AllowGroup sshusers
+PasswordAuthentication no
+HostbasedAuthentication no
+RSAAuthentication yes
+PubkeyAuthentication yes
+PermitEmptyPasswords no
+PermitRootLogin no
+ServerKeyBits 2048
+IgnoreRhosts yes
+RhostsAuthentication no
+RhostsRSAAuthentication no" >> /etc/ssh/ssh_config
 
 	chattr +i /etc/ssh/ssh_config
 	lsattr /etc/ssh/*
@@ -560,7 +570,7 @@ if [[ "$option" = "11" ]]; then
 		fi
 	fi
 
-	if [[ ${ID_LIKE} = "ID_LIKE=rhel fedora" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"rhel fedora\"" ]];
+	if [[ ${ID_LIKE} = "ID_LIKE=rhel fedora" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"rhel fedora\"" ]]; then
 		if [[ "$optionCorS" = "C" ]] || [[ "$optionCorS" = "c" ]] || [[ "$optionCorS" = "Client" ]] || [[ "$optionCorS" = "client" ]] || [[ "$optionCorS" = "CLIENT" ]]; then
 			printf '\nInstalling Ansible\n'
 			yum install epel-release
@@ -689,18 +699,26 @@ fi
 
 #Removes GCC, NC
 if [[ "$option" = "17" ]]; then
+	WHICH_GCC="$(which gcc")"
+	ID_LIKE="$(cat /etc/*release | grep "ID_LIKE")"
+
+	if [[ ${WHICH_GCC} = "" ]]; then
+		printf '\nNo GCC found!\n'
+	fi
+
 	if [[ ${ID_LIKE} = "ID_LIKE=rhel fedora" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"rhel fedora\"" ]]; then
-		printf '\nTODO\n'
+		yum remove gcc*
 	fi
 
 	if [[ ${ID_LIKE} = "ID_LIKE=arch" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"arch\"" ]]; then
-		printf '\nTODO\n'
+		pacman -Rs gcc*
 	fi
 
 	if [[ ${ID_LIKE} = "ID_LIKE=debian" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"debian\"" ]]; then
-		printf '\nTODO\n'
+		apt-get purge gcc*
 	fi
-	printf '\nTODO\n'
+
+	printf '\nDone!\n'
 fi
 
 
@@ -709,6 +727,8 @@ fi
 
 #audit sources/mirrors
 if [[ "$option" = "18" ]]; then
+	ID_LIKE="$(cat /etc/*release | grep "ID_LIKE")"
+
 	if [[ ${ID_LIKE} = "ID_LIKE=rhel fedora" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"rhel fedora\"" ]]; then
 		printf '\nTODO\n'
 	fi
@@ -722,6 +742,54 @@ if [[ "$option" = "18" ]]; then
 	fi
 	printf '\nTODO\n'
 fi
+
+
+
+
+
+#installs and sets up fail2ban
+if [[ "$option" = "19" ]]; then
+	ID_LIKE="$(cat /etc/*release | grep "ID_LIKE")"
+
+	if [[ ${ID_LIKE} = "ID_LIKE=rhel fedora" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"rhel fedora\"" ]]; then
+		yum update
+		yum install fail2ban
+	fi
+
+	if [[ ${ID_LIKE} = "ID_LIKE=arch" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"arch\"" ]]; then
+		pacman -Syu
+		pacman -S fail2ban
+	fi
+
+	if [[ ${ID_LIKE} = "ID_LIKE=debian" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"debian\"" ]]; then
+		apt-get update
+		apt-get install fail2ban
+		awk '{ printf "# "; print; }' /etc/fail2ban/jail.conf | sudo tee /etc/fail2ban/jail.local
+
+	fi
+	printf '\nTODO\n'
+fi
+
+
+
+
+#remove FTP/Telnet/Rlogin/Rsh services
+if [[ "$option" = "22" ]]; then
+	ID_LIKE="$(cat /etc/*release | grep "ID_LIKE")"
+
+	if [[ ${ID_LIKE} = "ID_LIKE=rhel fedora" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"rhel fedora\"" ]]; then
+		yum erase xinetd ypserv tftp-server telnet-server rsh-server
+	fi
+
+	if [[ ${ID_LIKE} = "ID_LIKE=arch" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"arch\"" ]]; then
+		printf '\nTODO\n'
+	fi
+
+	if [[ ${ID_LIKE} = "ID_LIKE=debian" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"debian\"" ]]; then
+		sudo apt-get --purge remove xinetd nis yp-tools tftpd atftpd tftpd-hpa telnetd rsh-server rsh-redone-server
+	fi
+fi
+
 
 #ends while loop
 done
