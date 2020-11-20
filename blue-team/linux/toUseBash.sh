@@ -340,9 +340,9 @@ fi
 
 if [[ "$option" = "7" ]]; then
 	printf '\nSaving iptables to ~/iptablesBackupBefore.txt . . .\n'
-	touch ~/iptablesBackupBefore.txt
 	iptables-save
-	iptables -L >> ~/iptablesBackupBefore.txt
+	mkdir ~/iptables_backups/
+	iptables -L >> ~/iptables_backups/iptablesBackupBefore.txt
 	printf '\nFlushing rules . . .\n'
 	iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -t raw -F
 	printf '\nWiping out all non-default chains . . .\n'
@@ -352,18 +352,17 @@ if [[ "$option" = "7" ]]; then
 	iptables -A OUTPUT -o lo -j ACCEPT
 	printf '\nAllows IN connections to any public services, default ports are 20,80,443\nmake sure to run the commands with the services the computer needs\n'
 	iptables -A INPUT -p tcp -m multiport --dports 22,80,443 -j ACCEPT
-	iptables -A INPUT -p tch -m state --state RELATED,ESTABLISHED -j ACCEPT
+	iptables -A INPUT -p tcp -m state --state RELATED,ESTABLISHED -j ACCEPT
 	printf '\nLog outgoing connections\n'
 	iptables -A OUTPUT -m state --state new -j LOG --log-uid
 	printf '\nBlock ICMP\n'
 	iptables -I INPUT -p icmp --icmp-type 0 -j DROP
 	iptables -I OUTPUT -p icmp --icmp-type 8 -j DROP
 	printf '\nDone\nSaving new iptable rules\n'
-	touch ~/iptablesBackupAfter.txt
 	iptables-save
-	iptables -L >> ~/iptablesBackupAfter.txt
-	chattr +i ~/iptablesBackupBefore.txt
-	chattr +i ~/iptablesBackupAfter.txt
+	iptables -L >> ~/iptables_backups/iptablesBackupAfter.txt
+	chattr +i ~/iptables_backups/iptablesBackupBefore.txt
+	chattr +i ~/iptables_backups/iptablesBackupAfter.txt
 fi
 
 if [[ "$option" = "8" ]]; then
