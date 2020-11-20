@@ -340,9 +340,9 @@ fi
 
 if [[ "$option" = "7" ]]; then
 	printf '\nSaving iptables to ~/iptablesBackupBefore.txt . . .\n'
-	touch ~/iptablesBackupBefore.txt
 	iptables-save
-	iptables -L >> ~/iptablesBackupBefore.txt
+	mkdir ~/iptables_backups/
+	iptables -L >> ~/iptables_backups/iptablesBackupBefore.txt
 	printf '\nFlushing rules . . .\n'
 	iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -t raw -F
 	printf '\nWiping out all non-default chains . . .\n'
@@ -359,11 +359,10 @@ if [[ "$option" = "7" ]]; then
 	iptables -I INPUT -p icmp --icmp-type 0 -j DROP
 	iptables -I OUTPUT -p icmp --icmp-type 8 -j DROP
 	printf '\nDone\nSaving new iptable rules\n'
-	touch ~/iptablesBackupAfter.txt
 	iptables-save
-	iptables -L >> ~/iptablesBackupAfter.txt
-	chattr +i ~/iptablesBackupBefore.txt
-	chattr +i ~/iptablesBackupAfter.txt
+	iptables -L >> ~/iptables_backups/iptablesBackupAfter.txt
+	chattr +i ~/iptables_backups/iptablesBackupBefore.txt
+	chattr +i ~/iptables_backups/iptablesBackupAfter.txt
 fi
 
 if [[ "$option" = "8" ]]; then
