@@ -352,7 +352,7 @@ if [[ "$option" = "7" ]]; then
 	iptables -A OUTPUT -o lo -j ACCEPT
 	printf '\nAllows IN connections to any public services, default ports are 20,80,443\nmake sure to run the commands with the services the computer needs\n'
 	iptables -A INPUT -p tcp -m multiport --dports 22,80,443 -j ACCEPT
-	iptables -A INPUT -p tch -m state --state RELATED,ESTABLISHED -j ACCEPT
+	iptables -A INPUT -p tcp -m state --state RELATED,ESTABLISHED -j ACCEPT
 	printf '\nLog outgoing connections\n'
 	iptables -A OUTPUT -m state --state new -j LOG --log-uid
 	printf '\nBlock ICMP\n'
