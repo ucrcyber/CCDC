@@ -5,12 +5,26 @@ if [ `whoami` != "root" ]; then
         exit 1
 fi
 
-echo Ll9fICAgICAgICBfXyAgICAgICAgX19fLiAgIC5fXyAgICAgICAgICAgICAgICAgCnxfX3xfX19fX18vICB8X19fX19fIFxfIHxfXyB8ICB8ICAgX19fXyAgIF9fX19fXwp8ICBcX19fXyBcICAgX19cX18gIFwgfCBfXyBcfCAgfCBfLyBfXyBcIC8gIF9fXy8KfCAgfCAgfF8+ID4gIHwgIC8gX18gXHwgXF9cIFwgIHxfXCAgX19fLyBcX19fIFwgCnxfX3wgICBfXy98X198IChfX19fICAvX19fICAvX19fXy9cX19fICA+X19fXyAgPgogICB8X198ICAgICAgICAgICAgIFwvICAgIFwvICAgICAgICAgIFwvICAgICBcLyAK | base64 -d
+echo Ll9fICAgICAgICBfXyAgICAgICAgX19fLiAgIC5fXyAgICAgICAgICAgICAgICAgCnxfX3xfX19fX18vICB8X19fX19fIFxfIHxfXyB8ICB8ICAgX19fXyAgIF9fX19fXwp8ICBcX19fXyBcICAgX19cX18gIFwgfCBfXyBcfCAgfCBfLyBfXyBcIC8gIF9fXy8KfCAgfCAgfF8+ID4gIHwgIC8gX18gXHwgXF9cIFwgIHxfXCAgX19fLyBcX19fIFwgCnxfX3wgICBfXy98X198IChfX19fICAvX19fICAvX19fXy9cX>
 
-sudo apt-get install iptables -y
+ID_LIKE="$(cat /etc/*release | grep "ID_LIKE")"
 
-echo Setting Timezone to America/Los_Angeles
-sudo timedatectl set-timezone America/Los_Angeles
+if [[ ${ID_LIKE} = "ID_LIKE=debian" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"debian\"" ]]; then
+        sudo apt-get install iptables -y
+fi
+
+elif [[ ${ID_LIKE} = "ID_LIKE=rhel fedora" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"rhel fedora\"" ]]; then
+        sudo yum install iptables
+fi
+
+else
+        echo "This operating system is not supported"
+        exit 1
+fi
+
+#echo Setting Timezone to America/Los_Angeles
+#sudo timedatectl set-timezone America/Los_Angeles
+
 sudo systemctl restart rsyslog
 
 echo Setting Up IPV4
