@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ `whoami` != "root" ]; then
-        echo "Script must be run as root"
+        echo "bro you already know why you're seeing this message"
         exit 1
 fi
 
