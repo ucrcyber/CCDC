@@ -14,7 +14,13 @@ if [[ ${ID_LIKE} = "ID_LIKE=debian" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"debian\"" ]
 fi
 
 elif [[ ${ID_LIKE} = "ID_LIKE=rhel fedora" ]] || [[ ${ID_LIKE} = "ID_LIKE=\"rhel fedora\"" ]]; then
-        sudo yum install iptables
+        sudo systemctl disable firewalld
+        sudo systemctl stop firewalld
+        sudo yum install iptables-services
+        sudo systemctl start iptables
+        sudo systemctl start ip6tables
+        sudo systemctl enable iptables
+        sudo systemctl enable ip6tables
 fi
 
 else
