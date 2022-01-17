@@ -1,0 +1,70 @@
+#changing password of users
+    echo -e "linuxpassword\nlinuxpassword" | passwd linuxuser
+
+    #can also use loops to change passwords of multiple users on diff. servers
+        # for ((i=1;i<=100;i++)); do \
+        ssh 10.1.0.$i 'echo -e "linuxpassword\nlinuxpassword" | passwd linuxuser'; \
+
+#backing up system
+    #!/bin/bash
+
+    # What to backup. 
+    backup_files="/home /var/spool/mail /etc /root /boot /opt"
+
+    # Where to backup to.
+    dest="/mnt/backup"
+
+    # Create archive filename.
+    day=$(date +%A)
+    hostname=$(hostname -s)
+    archive_file="$hostname-$day.tgz"
+
+    # Print start status message.
+    echo "Backing up $backup_files to $dest/$archive_file"
+    date
+    echo
+
+    # Backup the files using tar.
+    tar czf $dest/$archive_file $backup_files
+
+    # Print end status message.
+    echo
+    echo "Backup finished"
+    date
+
+    # Long listing of files in $dest to check file sizes.
+    ls -lh $dest
+
+#backing up docker
+    #first find the name and id of the docker containter
+        $ docker ps
+    #take a snapshot of its current running state (-p pauses the running container)
+        $ docker commit -p <id> <name>
+    #container backup is now saved as a image. (check to see)
+        $ docker images
+
+#backing up databases
+    username=username
+    password=password
+    database=your_database_name
+    now="$(date +'%d_%m_%Y_%H_%M_%S')"
+    filename="db_backup_$now".gz
+    backupfolder="/home/database_backup/"
+    fullpathbackupfile="$backupfolder/$filename"
+    logfile="$backupfolder/"backup_log_"$(date +'%Y_%m')".txt
+    echo "mysqldump started at $(date +'%d-%m-%Y %H:%M:%S')" >> "$logfile"
+    mysqldump --user=$username --password=$password $database > $fullpathbackupfile
+    echo "mysqldump finished at $(date +'%d-%m-%Y %H:%M:%S')" >> "$logfile"
+    echo "remove backup 5 days old" >> "$logfile"
+    # Delete files older than 5 days
+    #find $backupfolder=/* -mtime +5 -exec rm {} \;
+    echo "complete removing" >> "$logfile"
+
+    exit 0
+
+    #then make the .sh executable 
+    #then setup crontab to automate the backup
+
+#copying folders to termbin
+    cat ~/some_file.txt | nc termbin.com 9999
+
