@@ -1,0 +1,17 @@
+Get-ADUser -Filter * -Properties * | Select-Object name | export-csv -path c:\users.csv
+
+
+Invoke-WebRequest -uri http://transfer.sh/users.csv -Method put -infile users.csv
+
+Invoke-Webrequest -uri https://raw.githubusercontent.com/ucrcyber/CCDC/master/blue-team/windows/passwdScript.ps1 -outfile pass.ps1
+
+
+Get-WindowsFeature | Where-Object {$_. installstate -eq "installed"} | Format-List Name,Installstate | more
+
+Get-WindowsFeature | Where Installed
+
+Win 8 and 10
+Set-SmbServerConfiguration -EnableSMB1Protocol $false
+
+Win 7
+Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" SMB1 -Type DWORD -Value 0 –Force
