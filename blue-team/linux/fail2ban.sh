@@ -32,7 +32,7 @@ do
 			[sshd]
 			enabled = true
 			bantime = 5m
-			maxretry = 1
+			maxretry = 3
 		EOM
 
 		becho "Enabling fail2ban service"
