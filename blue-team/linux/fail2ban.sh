@@ -24,7 +24,7 @@ do
 			yum install -y epel-release
 		fi
 		
-        becho "Installing fail2ban with ${osInfo[$f]} fail2ban"
+		becho "Installing fail2ban with ${osInfo[$f]} fail2ban"
 		"$(${osInfo[$f]} fail2ban)"
 		
 		becho "Creating fail2ban config"
