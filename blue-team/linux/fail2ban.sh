@@ -1,6 +1,8 @@
+#!/bin/sh
+
 # Check for root
-if [ `whoami` != "root" ]; then
-	echo "\nScript must be run as root\n"
+if [ $(whoami) != "root" ]; then
+	echo "Script must be run as root"
 	exit 1
 fi
 
