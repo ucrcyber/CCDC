@@ -22,8 +22,8 @@ read -p "Please enter your username: " username
 # make backup folder if it doesn't exist
 ssh "$username@$serverIP" mkdir -p "/home/$username/backup"
 # call scp command on server’s backup folder
-scp hostname.csv "$username@$serverIP:/home/backup"
+scp `hostname`.csv "$username@$serverIP:/home/backup"
 
-rm hostname.csv
+rm `hostname`.csv
 rm u.txt
 rm lists.txt
