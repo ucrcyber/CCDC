@@ -16,20 +16,15 @@ mkdir -p /var/backups
 
 becho "Backing up pam"
 cp -r /etc/pam* /var/backups
-cp -r /lib/security* /var/backups
+cp -r /lib/security* /var/backup
 
 becho "Backing up configuration files from /etc"
 cp -r /etc /var/backup
 
 if [ -d "/var/www" ]; then
 	becho "Backing up web files"
-	cp -r /var/www /var/backups
-fi
-
-if [ -d "/var/lib/mysql" ]; then
-	becho "Backing up MySQL"
-	mysqldump -u root -p --all-databases > /var/backups/mysql.sql
+	cp -r /var/www /var/backup
 fi
 
 becho "Making backups immutable"
-chattr +i -R /var/backups/*
+chattr +i -RV /var/backups/*
