@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Check for root
 if [ $(whoami) != "root" ]; then
