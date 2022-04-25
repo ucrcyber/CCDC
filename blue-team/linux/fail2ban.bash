@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Check for root
 if [ $(whoami) != "root" ]; then
@@ -27,7 +27,7 @@ do
 		fi
 		
 		becho "Installing fail2ban with ${osInfo[$f]} fail2ban"
-		"$(${osInfo[$f]} fail2ban)"
+		echo "$(${osInfo[$f]} fail2ban)"
 		
 		becho "Creating fail2ban config"
 		cat > /etc/fail2ban/jail.local <<- EOM
