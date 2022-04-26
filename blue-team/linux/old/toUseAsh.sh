@@ -8,8 +8,7 @@ read -r passConfirm
 input="users.txt"
 while IFS= read -r user
 do
-	echo "Changing password for $user"
-	newPass="$passTemp"
-	echo -e "$newPass\\n$newPass" | passwd "$user"
+    echo "Changing password for $user"
+    newPass="$passTemp"
+    echo -e "$newPass\\n$newPass" | passwd "$user"
 done < "$input"
-

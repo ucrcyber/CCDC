@@ -42,7 +42,7 @@ CRED_BYPASS=0  # Whether or not the current user is root and accessing a local D
 if [[ $DB_HOST != "localhost" || $EUID -ne 0 ]] ; then
     if [[ -z "$DB_USER" ]]; then
         val_err '$DB_USER'
-    elif [[ -z $DB_PASS ]]; then
+        elif [[ -z $DB_PASS ]]; then
         val_err '$DB_PASS'
     fi
 else
@@ -100,7 +100,7 @@ if [[ ! -f $BACKUP_PATH ]]; then
     git rev-parse HEAD > "../${TARGET_FILE}"
     chmod 600 "../${TARGET_FILE}"
     cd -
-elif diff -q "${BACKUP_PATH}" "${BACKUP_PATH}.tmp"; then
+    elif diff -q "${BACKUP_PATH}" "${BACKUP_PATH}.tmp"; then
     echo "DB state unchanged"
     # If there's no difference, remove the .tmp file and don't do anything
     rm -f "${BACKUP_PATH}.tmp"
@@ -108,14 +108,14 @@ else
     # If there is a difference, warn user, advance to latest git revision and commit
     echo "DIFFERENCE FOUND IN CURRENT DB STATE:"
     diff "${BACKUP_PATH}" "${BACKUP_PATH}.tmp"
-
+    
     cd "$BACKUP_DIR"
     git checkout master
     mv "${BACKUP_FILE}.tmp" "${BACKUP_FILE}"
     git add "$BACKUP_FILE"
     git -c user.name='DB Backup' -c user.email='willshiao@gmail.com' commit -m "DB backup of ${DB_HOST} at $(date +%Y-%m-%d-T%H:%M:%S)"
     echo "Completed DB backup, restoring..."
-
+    
     git checkout "$(cat "$TARGET_FILE")"
     # Restore DB state to target
     if [[ $CRED_BYPASS == 0 ]]; then
@@ -125,7 +125,7 @@ else
     fi
     git checkout master
     cd -
- 
+    
     echo "DB Restored!"
 fi
 

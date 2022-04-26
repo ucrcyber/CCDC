@@ -24,10 +24,10 @@ do
             becho "Adding EPEL repository"
             yum install -y epel-release
         fi
-
+        
         becho "Installing fail2ban with ${osInfo[$f]} fail2ban"
         echo "$(${osInfo[$f]} fail2ban)"
-
+        
         becho "Creating fail2ban config"
 		cat > /etc/fail2ban/jail.local <<- EOM
 			[sshd]
@@ -35,7 +35,7 @@ do
 			bantime = 5m
 			maxretry = 3
 		EOM
-
+        
         becho "Enabling fail2ban service"
         if [[ "$f" == "/etc/alpine-release" ]]; then
             rc-update add fail2ban
