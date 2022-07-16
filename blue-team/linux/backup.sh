@@ -19,7 +19,7 @@ cp -r /etc/pam* /var/backups
 cp -r /lib/security* /var/backups
 
 becho "Backing up configuration files from /etc"
-cp -r /etc /var/backup
+cp -r /etc /var/backups
 
 if [ -d "/var/www" ]; then
     becho "Backing up web files"
